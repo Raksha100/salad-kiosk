@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Customize Salad</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <button onclick="history.back()" class="back-button">&larr; Back</button>
+
+  <div class="customize-container">
+    <h1>🥗 Customize Your Salad</h1>
+
+    <form id="customize-form">
+      <div class="section">
+        <h2>Extra Toppings (₹20 each):</h2>
+        <div class="options">
+          <label><input type="checkbox" name="toppings" value="Cheese" /> Cheese</label>
+          <label><input type="checkbox" name="toppings" value="Olives" /> Olives</label>
+          <label><input type="checkbox" name="toppings" value="Corn" /> Corn</label>
+          <label><input type="checkbox" name="toppings" value="Croutons" /> Croutons</label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Dressing:</h2>
+        <select name="dressing" required>
+          <option value="Ranch">Ranch</option>
+          <option value="Honey Mustard">Honey Mustard</option>
+          <option value="Sweet Onion">Sweet Onion</option>
+          <option value="Mintolicious">Mintolicious</option>
+        </select>
+      </div>
+
+      <div class="section">
+        <h2>Quantity:</h2>
+        <input type="number" name="quantity" min="1" value="1" required />
+      </div>
+
+      <input type="hidden" id="salad-name" />
+      <input type="hidden" id="salad-price" />
+
+      <button type="submit" id="add-to-cart">Add to Cart</button>
+
+      <div class="link-row">
+        <a href="salad-list.html" class="link-btn">+ Add More Items</a>
+        <a href="cart.html" class="link-btn">🛒 Go to Cart</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name');
+    const price = urlParams.get('price');
+
+    document.getElementById("salad-name").value = name;
+    document.getElementById("salad-price").value = price;
+
+    const form = document.getElementById("customize-form");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const toppings = [...form.elements["toppings"]]
+        .filter(i => i.checked)
+        .map(i => i.value);
+      const dressing = form.elements["dressing"].value;
+      const quantity = parseInt(form.elements["quantity"].value);
+
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      cart.push({ name, price, toppings, dressing, quantity });
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert("✨ Added to Cart!");
+    });
+  </script>
+</body>
+</html>

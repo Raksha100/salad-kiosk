@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Salad List</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+  <button onclick="history.back()" class="back-button">&larr; Back</button>
+  <div class="salad-list-container">
+    <h1 id="salad-type-title">Salads</h1>
+    <div id="salad-grid" class="salad-grid"></div>
+  </div>
+
+  <script>
+    const salads = {
+      veg: [
+        { name: "Spanish Bajra Chickpeas", price: 169 },
+        { name: "Spinach Sesame Salad", price: 169 },
+        { name: "Protein Punch", price: 189 },
+        { name: "Indian Orzo", price: 189 },
+        { name: "Spinach Mexican", price: 189 },
+        { name: "Greek Garden", price: 189 },
+        { name: "Mandarin Green", price: 199 },
+        { name: "Fantastic Four", price: 199 },
+        { name: "Mushroom Tofu Mint", price: 229 }
+      ],
+      nonveg: [
+        { name: "Chicken Herbaceous", price: 279 },
+        { name: "Chicken Pasta Rumble", price: 269 },
+        { name: "Chicken Skinny Caesar", price: 279 },
+        { name: "Chicken Mexicana", price: 279 },
+        { name: "Chicken With Lime Mint", price: 279 },
+        { name: "Egg Salad With Tikka", price: 270 },
+        { name: "Coriander Fish Potato", price: 289 },
+        { name: "Shrimp Avocado", price: 299 }
+      ]
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get("type") || "veg";
+
+    const saladGrid = document.getElementById("salad-grid");
+    const title = document.getElementById("salad-type-title");
+    title.textContent = type === "veg" ? "🥦 Veg Salads" : "🍗 Non-Veg Salads";
+
+    salads[type].forEach((item, index) => {
+      const div = document.createElement("div");
+      div.className = "salad-card";
+      div.innerHTML = `<strong>${item.name}</strong><br>₹${item.price}`;
+      div.onclick = () => {
+        const encodedName = encodeURIComponent(item.name);
+        window.location.href = `customize.html?name=${encodedName}&price=${item.price}`;
+      };
+      saladGrid.appendChild(div);
+    });
+  </script>
+</body>
+</html>

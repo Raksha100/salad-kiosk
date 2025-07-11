@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    .payment-container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff8ed;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      animation: slideIn 0.6s ease-out;
+    }
+
+    .payment-container h1 {
+      font-size: 2.5rem;
+      color: #4fa87c;
+      margin-bottom: 20px;
+    }
+
+    .qr-code {
+      width: 250px;
+      height: 250px;
+      border: 6px dashed #ffcc8f;
+      border-radius: 20px;
+      padding: 10px;
+      background-color: white;
+      margin-bottom: 20px;
+    }
+
+    .upi-id {
+      font-size: 1.4rem;
+      color: #5c4a2c;
+      background-color: #fffbe0;
+      padding: 12px 20px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 30px;
+      border: 2px dashed #fcd8a8;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .home-button {
+      display: inline-block;
+      font-size: 1.5rem;
+      padding: 10px 30px;
+      background-color: #ffcc8f;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      text-decoration: none;
+      font-family: 'VT323', monospace;
+      box-shadow: 2px 4px #e79b5c;
+      transition: 0.3s ease;
+    }
+
+    .home-button:hover {
+      background-color: #ffc074;
+      transform: translateY(-2px);
+      box-shadow: 2px 6px #e79b5c;
+    }
+  </style>
+</head>
+<body>
+  <div class="payment-container">
+    <h1>💸 Complete Your Payment</h1>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=greens@upi&pn=Greens%20Cafe&mc=0000&mode=02&purpose=00" alt="UPI QR Code" class="qr-code">
+    <div class="upi-id">UPI ID: <strong>greens@upi</strong></div>
+    <br>
+    <a href="index.html" class="home-button">🏠 Back to Home</a>
+  </div>
+</body>
+</html>
+<script>
+  let inactivityTimeout;
+
+  function resetInactivityTimer() {
+    clearTimeout(inactivityTimeout);
+    inactivityTimeout = setTimeout(() => {
+      window.location.href = "index.html";
+    }, 60000); // 60 seconds
+  }
+
+  // Events that reset the timer
+  ['mousemove', 'mousedown', 'keypress', 'touchstart'].forEach(event =>
+    document.addEventListener(event, resetInactivityTimer)
+  );
+
+  // Start timer on page load
+  resetInactivityTimer();
+</script>
