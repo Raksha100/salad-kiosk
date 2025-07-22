@@ -5,11 +5,49 @@
   <title>Salad List</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    .salad-card {
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .salad-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .salad-list-container {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fffef7;
+      border-radius: 10px;
+      animation: fadeIn 0.8s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .subtext {
+      text-align: center;
+      color: #6b5045;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
   <button onclick="history.back()" class="back-button">&larr; Back</button>
+
   <div class="salad-list-container">
     <h1 id="salad-type-title">Salads</h1>
+    <p class="subtext">Tap on a salad to customize it your way 🥗</p>
     <div id="salad-grid" class="salad-grid"></div>
   </div>
 
@@ -45,7 +83,7 @@
     const title = document.getElementById("salad-type-title");
     title.textContent = type === "veg" ? "🥦 Veg Salads" : "🍗 Non-Veg Salads";
 
-    salads[type].forEach((item, index) => {
+    salads[type].forEach((item) => {
       const div = document.createElement("div");
       div.className = "salad-card";
       div.innerHTML = `<strong>${item.name}</strong><br>₹${item.price}`;

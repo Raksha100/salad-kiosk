@@ -5,17 +5,55 @@
   <title>Salad Menu</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
+  <style>
+    .fade-in {
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .salad-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .salad-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .menu-type-container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fffdf6;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    h2 {
+      color: #7b5e57;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
-  <button onclick="history.back()" class="back-button">&larr; Back</button>
+  <button onclick="history.back()" class="back-button" aria-label="Go back to previous page">&larr; Back</button>
 
-  <div class="menu-type-container">
+  <div class="menu-type-container fade-in">
     <h1>Choose Your Salad Type</h1>
+    <h2>What are you craving today?</h2>
     <div class="card-container">
-      <a href="salad-list.html?type=veg" class="salad-card veg">
+      <a href="salad-list.html?type=veg" class="salad-card veg" aria-label="Order vegetarian salads">
         🥬<br>Veg Salads
       </a>
-      <a href="salad-list.html?type=nonveg" class="salad-card nonveg">
+      <a href="salad-list.html?type=nonveg" class="salad-card nonveg" aria-label="Order non-vegetarian salads">
         🍗<br>Non-Veg Salads
       </a>
     </div>

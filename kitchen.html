@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kitchen View</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'VT323', monospace;
+      background-color: #fffaf3;
+      padding: 20px;
+      color: #5e4b3c;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    .order-card {
+      background: #fff0e6;
+      border: 2px dashed #e7c5aa;
+      margin: 15px 0;
+      padding: 15px 20px;
+      border-radius: 20px;
+      box-shadow: 2px 2px 5px #d9b99b;
+      position: relative;
+    }
+
+    .order-card h3 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .order-card p {
+      margin: 4px 0;
+      font-size: 18px;
+    }
+
+    .status {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .status-preparing { color: #e6b800; }
+    .status-almost { color: #ff8800; }
+    .status-ready { color: #2fa56a; }
+
+    .status-button {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .status-button button {
+      font-family: 'VT323', monospace;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.3s ease;
+    }
+
+    .status-button button:hover {
+      background-color: #ffe0cc;
+    }
+
+    .timestamp {
+      font-size: 14px;
+      color: #999;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍴 Kitchen Orders</h1>
+  <div id="orders-container">Loading orders...</div>
+
+  <script>
+    let orderStatuses = {}; // memory object
+
+    function getStatusText(status) {
+      switch (status) {
+        case "preparing": return "🥗 Preparing";
+        case "almost": return "🍳 Almost Ready";
+        case "ready": return "✅ Ready to Serve";
+        default: return "🥗 Preparing";
+      }
+    }
+
+    function renderOrders(data) {
+      const container = document.getElementById('orders-container');
+      container.innerHTML = '';
+
+      if (data.length === 0) {
+        container.innerHTML = "<p>No orders yet!</p>";
+        return;
+      }
+
+      data.reverse().forEach((order, index) => {
+        const card = document.createElement('div');
+        card.className = 'order-card';
+
+        const id = data.length - index;
+        const status = orderStatuses[id] || "preparing";
+        const timestamp = new Date(order.timestamp).toLocaleString();
+
+        card.innerHTML = `
+          <h3>Order #${id}</h3>
+          <p><strong>Salad:</strong> ${order.name} × ${order.quantity}</p>
+          <p><strong>Toppings:</strong> ${order.toppings.join(', ') || 'None'}</p>
+          <p><strong>Dressings:</strong> ${order.dressings.join(', ') || 'None'}</p>
+          <p><strong>Total:</strong> ₹${order.total}</p>
+          <p class="timestamp">${timestamp}</p>
+          <p class="status status-${status}">${getStatusText(status)}</p>
+          <div class="status-button">
+            <button onclick="updateStatus(${id}, 'preparing')">🥗 Preparing</button>
+            <button onclick="updateStatus(${id}, 'almost')">🍳 Almost Ready</button>
+            <button onclick="updateStatus(${id}, 'ready')">✅ Ready</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function updateStatus(id, newStatus) {
+      orderStatuses[id] = newStatus;
+      fetchOrders();
+    }
+
+    function fetchOrders() {
+      fetch('http://localhost:3000/api/orders')
+        .then(res => res.json())
+        .then(data => renderOrders(data))
+        .catch(err => {
+          document.getElementById('orders-container').innerHTML = '<p>Failed to load orders.</p>';
+          console.error(err);
+        });
+    }
+
+    fetchOrders();
+    setInterval(fetchOrders, 15000); // Auto-refresh every 15s
+  </script>
+</body>
+</html>

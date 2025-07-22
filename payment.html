@@ -6,101 +6,129 @@
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <style>
-    .payment-container {
-      max-width: 500px;
-      margin: auto;
+    body {
       background: #fff8ed;
-      border-radius: 20px;
-      padding: 40px;
-      text-align: center;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      animation: slideIn 0.6s ease-out;
-    }
-
-    .payment-container h1 {
-      font-size: 2.5rem;
-      color: #4fa87c;
-      margin-bottom: 20px;
-    }
-
-    .qr-code {
-      width: 250px;
-      height: 250px;
-      border: 6px dashed #ffcc8f;
-      border-radius: 20px;
-      padding: 10px;
-      background-color: white;
-      margin-bottom: 20px;
-    }
-
-    .upi-id {
-      font-size: 1.4rem;
-      color: #5c4a2c;
-      background-color: #fffbe0;
-      padding: 12px 20px;
-      border-radius: 12px;
-      display: inline-block;
-      margin-bottom: 30px;
-      border: 2px dashed #fcd8a8;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .home-button {
-      display: inline-block;
-      font-size: 1.5rem;
-      padding: 10px 30px;
-      background-color: #ffcc8f;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      text-decoration: none;
       font-family: 'VT323', monospace;
-      box-shadow: 2px 4px #e79b5c;
-      transition: 0.3s ease;
+      text-align: center;
+      color: #3e2c23;
+      padding: 20px;
     }
-
-    .home-button:hover {
-      background-color: #ffc074;
-      transform: translateY(-2px);
-      box-shadow: 2px 6px #e79b5c;
+    .qr-code {
+      margin: 20px auto;
+      width: 200px;
+      height: 200px;
+    }
+    .receipt-box {
+      background: #fff4dc;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: auto;
+    }
+    button {
+      background: #e78f64;
+      border: none;
+      padding: 10px 20px;
+      font-size: 20px;
+      cursor: pointer;
+      margin: 10px;
+      border-radius: 8px;
+    }
+    button:hover {
+      background: #d8774c;
     }
   </style>
 </head>
 <body>
-  <div class="payment-container">
-    <h1>💸 Complete Your Payment</h1>
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=greens@upi&pn=Greens%20Cafe&mc=0000&mode=02&purpose=00" alt="UPI QR Code" class="qr-code">
-    <div class="upi-id">UPI ID: <strong>greens@upi</strong></div>
-    <br>
-    <a href="index.html" class="home-button">🏠 Back to Home</a>
+
+  <div class="receipt-box">
+    <h2>🥗 Your Order Summary</h2>
+    <div id="receipt"></div>
+    <p>🎉 Order placed successfully!</p>
+    <p>⏳ Please complete payment in 95 seconds</p>
+
+    <p><strong>Scan to Pay ₹<span id="total-amount">0</span></strong></p>
+
+    <!-- Static fallback image -->
+    <img src="upi.jpg" alt="UPI QR Code Fallback" class="qr-code" id="fallback-img" style="display: none;" />
+
+    <!-- Dynamic QR code canvas -->
+    <canvas id="upi-qr" class="qr-code"></canvas>
+
+    <p>UPI ID: sakshyysharma20@okicici</p>
+
+    <button onclick="window.location.href='index.html'">🏠 Back to Home</button>
+    <button id="send-btn">📤 Send to Kitchen</button>
   </div>
+
+  <!-- QR Code Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+  <script>
+    const order = JSON.parse(localStorage.getItem("saladOrder")) || {};
+    const receiptDiv = document.getElementById("receipt");
+    const totalSpan = document.getElementById("total-amount");
+    const sendBtn = document.getElementById("send-btn");
+
+    const lines = [];
+
+    if (order.salad) {
+      lines.push(`<strong>Salad:</strong> ${order.salad} (₹${order.price || 0})`);
+    }
+    if (order.quantity) {
+      lines.push(`<strong>Quantity:</strong> ${order.quantity}`);
+    }
+    if (order.toppings?.length) {
+      lines.push(`<strong>Toppings:</strong> ${order.toppings.join(", ")}`);
+    }
+    if (order.dressings?.length) {
+      lines.push(`<strong>Dressings:</strong> ${order.dressings.join(", ")}`);
+    }
+    if (order.extras?.length) {
+      lines.push(`<strong>Extras:</strong> ${order.extras.join(", ")}`);
+    }
+
+    const total = order.total || 0;
+    lines.push(`<strong>Total:</strong> ₹${total}`);
+    totalSpan.textContent = total;
+
+    receiptDiv.innerHTML = lines.join("<br>");
+
+    // Generate UPI QR
+    const upiId = "sakshyysharma20@okicici";
+    const payeeName = "Salad Kiosk";
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${total}&cu=INR`;
+
+    QRCode.toCanvas(document.getElementById("upi-qr"), upiUrl, error => {
+      if (error) {
+        console.error("QR Code error:", error);
+        document.getElementById("fallback-img").style.display = "block";
+        document.getElementById("upi-qr").style.display = "none";
+      }
+    });
+
+    // Send to kitchen
+    sendBtn.addEventListener("click", () => {
+      sendBtn.disabled = true;
+      const timestamp = new Date().toLocaleString("en-IN");
+      const kitchenOrder = { ...order, timestamp };
+
+      fetch("http://localhost:3000/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(kitchenOrder)
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert("✅ Order sent to kitchen!");
+          localStorage.removeItem("saladOrder");
+        })
+        .catch(err => {
+          alert("❌ Failed to send to kitchen");
+          sendBtn.disabled = false;
+        });
+    });
+  </script>
 </body>
 </html>
-<script>
-  let inactivityTimeout;
-
-  function resetInactivityTimer() {
-    clearTimeout(inactivityTimeout);
-    inactivityTimeout = setTimeout(() => {
-      window.location.href = "index.html";
-    }, 60000); // 60 seconds
-  }
-
-  // Events that reset the timer
-  ['mousemove', 'mousedown', 'keypress', 'touchstart'].forEach(event =>
-    document.addEventListener(event, resetInactivityTimer)
-  );
-
-  // Start timer on page load
-  resetInactivityTimer();
-</script>

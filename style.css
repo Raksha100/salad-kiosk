@@ -322,3 +322,73 @@ select, input[type="number"] {
   transform: translateY(-2px);
   box-shadow: 2px 6px #e79b5c;
 }
+/* Receipt container layout */
+.receipt-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  background: #fff8ed;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: auto;
+}
+
+/* Receipt box (left) */
+.receipt-box {
+  background: #fffaf1;
+  border: 2px dashed #d1bfa7;
+  padding: 25px;
+  border-radius: 16px;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  flex: 1 1 300px;
+  min-width: 300px;
+}
+
+/* QR box (right) */
+.qr-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fffaf1;
+  padding: 25px;
+  border-radius: 16px;
+  border: 2px dashed #d1bfa7;
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+.qr-box img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.qr-box p {
+  font-size: 18px;
+  margin-top: 0;
+}
+
+/* Header and item styles */
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+
+.item-row.header {
+  font-weight: bold;
+  border-bottom: 1px dashed #aaa;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+}
+
+.charges, .total, .order-info {
+  margin-top: 15px;
+}

@@ -42,7 +42,7 @@
       div.innerHTML = `
         <strong>${item.name || '🥗 Salad'}</strong><br>
         🧂 ${toppings.length ? toppings.join(", ") : "No extra toppings"}<br>
-        🥣 Dressing: ${item.dressing}<br>
+        🥣 Dressing: ${Array.isArray(item.dressings) && item.dressings.length ? item.dressings.join(", ") : "None"}
         🔢 Qty: ${quantity}<br>
         💰 ₹${itemTotal}
       `;

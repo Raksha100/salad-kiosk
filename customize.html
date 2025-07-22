@@ -5,6 +5,36 @@
   <title>Customize Salad</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
+  <style>
+    .section h2 {
+      margin-top: 15px;
+      color: #5c4332;
+    }
+
+    .btn-row button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background: #ffe9d6;
+      border: 2px dashed #a0755c;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn-row button:hover {
+      background: #fff3e6;
+    }
+
+    .customize-container {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
   <button onclick="history.back()" class="back-button">&larr; Back</button>
@@ -24,13 +54,13 @@
       </div>
 
       <div class="section">
-        <h2>Dressing:</h2>
-        <select name="dressing" required>
-          <option value="Ranch">Ranch</option>
-          <option value="Honey Mustard">Honey Mustard</option>
-          <option value="Sweet Onion">Sweet Onion</option>
-          <option value="Mintolicious">Mintolicious</option>
-        </select>
+        <h2>Dressings (you can choose multiple):</h2>
+        <div class="options">
+          <label><input type="checkbox" name="dressings" value="Ranch" /> Ranch</label>
+          <label><input type="checkbox" name="dressings" value="Honey Mustard" /> Honey Mustard</label>
+          <label><input type="checkbox" name="dressings" value="Sweet Onion" /> Sweet Onion</label>
+          <label><input type="checkbox" name="dressings" value="Mintolicious" /> Mintolicious</label>
+        </div>
       </div>
 
       <div class="section">
@@ -41,7 +71,10 @@
       <input type="hidden" id="salad-name" />
       <input type="hidden" id="salad-price" />
 
-      <button type="submit" id="add-to-cart">Add to Cart</button>
+      <div class="btn-row">
+        <button type="button" id="add-to-cart">🛒 Add to Cart</button>
+        <button type="button" id="place-order">✅ Place Order</button>
+      </div>
 
       <div class="link-row">
         <a href="salad-list.html" class="link-btn">+ Add More Items</a>
@@ -50,28 +83,68 @@
     </form>
   </div>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('name');
-    const price = urlParams.get('price');
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const name = urlParams.get('name');
+  const price = parseFloat(urlParams.get('price'));
 
-    document.getElementById("salad-name").value = name;
-    document.getElementById("salad-price").value = price;
+  document.getElementById("salad-name").value = name;
+  document.getElementById("salad-price").value = price;
 
-    const form = document.getElementById("customize-form");
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const toppings = [...form.elements["toppings"]]
-        .filter(i => i.checked)
-        .map(i => i.value);
-      const dressing = form.elements["dressing"].value;
-      const quantity = parseInt(form.elements["quantity"].value);
+  const form = document.getElementById("customize-form");
 
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      cart.push({ name, price, toppings, dressing, quantity });
-      localStorage.setItem("cart", JSON.stringify(cart));
-      alert("✨ Added to Cart!");
-    });
-  </script>
+  function getOrderDetails() {
+    const toppings = [...form.elements["toppings"]]
+      .filter(i => i.checked)
+      .map(i => i.value);
+
+    const dressings = [...form.elements["dressings"]]
+      .filter(i => i.checked)
+      .map(i => i.value);
+
+    const quantity = parseInt(form.elements["quantity"].value);
+    const toppingCost = toppings.length * 20;
+    const total = quantity * (price + toppingCost);
+
+    return {
+      name,
+      price,
+      toppings,
+      dressings,
+      quantity,
+      total,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  document.getElementById("add-to-cart").addEventListener("click", () => {
+    const order = getOrderDetails();
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    cart.push(order);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    alert("✨ Added to Cart!");
+  });
+
+  document.getElementById("place-order").addEventListener("click", async () => {
+    const order = getOrderDetails();
+    localStorage.setItem("saladOrder", JSON.stringify(order));
+
+    // OPTIONAL: send to backend
+    try {
+      await fetch("http://localhost:3000/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(order)
+      });
+    } catch (err) {
+      console.error("Failed to send to backend:", err);
+    }
+
+    window.location.href = "payment.html";
+  });
+</script>
+
 </body>
 </html>
