@@ -41,12 +41,45 @@
       color: #7b5e57;
       margin-bottom: 20px;
     }
+
+    .weather-suggestion {
+      background: #f0f9ff;
+      border: 1px solid #cceeff;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 18px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #305050;
+    }
+
+    .surprise-btn {
+      display: block;
+      margin: 25px auto 10px;
+      padding: 10px 20px;
+      font-size: 20px;
+      border: none;
+      background: #ffe5b4;
+      color: #6b4f3b;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'VT323', monospace;
+      transition: all 0.2s ease;
+    }
+
+    .surprise-btn:hover {
+      background-color: #ffddb0;
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
   <button onclick="history.back()" class="back-button" aria-label="Go back to previous page">&larr; Back</button>
 
   <div class="menu-type-container fade-in">
+    <!-- ☀️ Weather-Based Suggestion -->
+    <div class="weather-suggestion" id="weatherTip">Checking today’s salad vibe...</div>
+
     <h1>Choose Your Salad Type</h1>
     <h2>What are you craving today?</h2>
     <div class="card-container">
@@ -57,6 +90,58 @@
         🍗<br>Non-Veg Salads
       </a>
     </div>
+
+    <!-- 🎲 Surprise Me! Button -->
+    <button class="surprise-btn" onclick="surpriseOrder()">🎲 Surprise Me!</button>
   </div>
+
+  <script>
+    // 🎯 Surprise Me Logic
+    function surpriseOrder() {
+      const salads = ["Spinach Mexican", "Caesar Crunch", "Chickpea Burst", "Grilled Chicken", "Tofu Thai"];
+      const toppings = ["Crispy Onions", "Feta Cubes", "Roasted Corn", "Boiled Egg"];
+      const dressings = ["Mint Yogurt", "Spicy Mayo", "Classic Vinaigrette"];
+
+      const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+
+      const combo = {
+        salad: rand(salads),
+        topping: rand(toppings),
+        dressing: rand(dressings)
+      };
+
+      const total = 189;
+      const discounted = Math.random() < 0.5; // 50% chance of discount
+      const finalTotal = discounted ? total * 0.9 : total;
+
+      alert(
+        `🎉 Your Surprise Combo:\n🥗 Salad: ${combo.salad}\n➕ Topping: ${combo.topping}\n💧 Dressing: ${combo.dressing}\n\nTotal: ₹${finalTotal.toFixed(0)}${discounted ? " (10% OFF!)" : ""}`
+      );
+
+      // Optional: Store in localStorage or redirect to payment/order page
+    }
+
+    // 🌦️ Weather-based Suggestion (uses Open-Meteo, no API key)
+    async function fetchWeatherSuggestion() {
+      try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=28.6139&longitude=77.2090&current_weather=true');
+        const data = await res.json();
+        const temp = data.current_weather.temperature;
+        const suggestion = document.getElementById('weatherTip');
+
+        if (temp > 30) {
+          suggestion.textContent = `🌞 Hot day! Try a refreshing Mint Yogurt Chickpea Salad 🍃`;
+        } else if (temp < 20) {
+          suggestion.textContent = `🥶 Chilly outside! Fuel up with a hearty Grilled Chicken Salad 🍗`;
+        } else {
+          suggestion.textContent = `🌤️ Great weather for any salad! Maybe a Tofu Thai with Classic Dressing? 🥗`;
+        }
+      } catch (err) {
+        document.getElementById('weatherTip').textContent = "🌈 Weather vibes unavailable. Choose freely!";
+      }
+    }
+
+    fetchWeatherSuggestion();
+  </script>
 </body>
 </html>
