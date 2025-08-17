@@ -114,7 +114,7 @@
       const timestamp = new Date().toLocaleString("en-IN");
       const kitchenOrder = { ...order, timestamp };
 
-      fetch("http://localhost:3000/api/orders", {
+fetch("https://salad-kiosk-backend.onrender.com/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(kitchenOrder)

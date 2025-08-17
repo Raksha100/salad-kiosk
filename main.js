@@ -12,7 +12,8 @@ function createWindow() {
     title: "Saladific Café"
   });
 
-  win.loadFile('index.html'); // Make sure this path is correct
+  // Load your deployed Netlify frontend
+  win.loadURL('https://salad-kiosk.netlify.app/');
 }
 
 app.whenReady().then(createWindow);
