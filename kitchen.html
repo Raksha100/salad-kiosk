@@ -132,7 +132,7 @@
     }
 
     function fetchOrders() {
-fetch('https://salad-kiosk-backend.onrender.com/api/orders')
+      fetch('http://localhost:3000/api/orders')
         .then(res => res.json())
         .then(data => renderOrders(data))
         .catch(err => {
