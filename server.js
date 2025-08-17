@@ -5,12 +5,11 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 const ORDERS_FILE = path.join(__dirname, 'orders.json');
 
 // ✅ Middleware
 app.use(cors({
-  origin: '*' // allow Netlify frontend
+  origin: '*' // allow requests from Netlify frontend
 }));
 app.use(express.json());
 
@@ -19,7 +18,7 @@ if (!fs.existsSync(ORDERS_FILE)) {
   fs.writeFileSync(ORDERS_FILE, JSON.stringify([]));
 }
 
-// ✅ Root route for Railway check
+// ✅ Root route
 app.get('/', (req, res) => {
   res.send('🥗 Saladific Kiosk API is running! Use /api/orders to view or add orders.');
 });
@@ -30,6 +29,7 @@ app.get('/api/orders', (req, res) => {
     const data = fs.readFileSync(ORDERS_FILE, 'utf8');
     res.json(JSON.parse(data));
   } catch (err) {
+    console.error('Error reading orders:', err);
     res.status(500).json({ error: 'Failed to read orders.' });
   }
 });
@@ -48,11 +48,13 @@ app.post('/api/orders', (req, res) => {
 
     res.status(201).json({ message: 'Order saved!' });
   } catch (err) {
+    console.error('Error saving order:', err);
     res.status(500).json({ error: 'Failed to save order.' });
   }
 });
 
 // ✅ Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Railway should expose it at https://<your-railway-app>.up.railway.app/`);
 });
