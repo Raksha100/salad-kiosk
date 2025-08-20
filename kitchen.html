@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Kitchen View</title>
+  <title>🍴 Kitchen Orders</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
   <style>
     body {
@@ -50,6 +50,7 @@
       margin-top: 10px;
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .status-button button {
@@ -59,6 +60,7 @@
       border-radius: 10px;
       cursor: pointer;
       font-size: 18px;
+      background: #fbe4d8;
       transition: background 0.3s ease;
     }
 
@@ -77,75 +79,77 @@
   <h1>🍴 Kitchen Orders</h1>
   <div id="orders-container">Loading orders...</div>
 
-  <script>
-    let orderStatuses = {}; // Tracks status by order.id
+<script>
+  let orderStatuses = {}; // Track each order's status locally
 
-    function getStatusText(status) {
-      switch (status) {
-        case "preparing": return "🥗 Preparing";
-        case "almost": return "🍳 Almost Ready";
-        case "ready": return "✅ Ready to Serve";
-        default: return "🥗 Preparing";
-      }
+  function getStatusText(status) {
+    switch (status) {
+      case "preparing": return "🥗 Preparing";
+      case "almost": return "🍳 Almost Ready";
+      case "ready": return "✅ Ready to Serve";
+      default: return "🥗 Preparing";
+    }
+  }
+
+  function renderOrders(data) {
+    const container = document.getElementById('orders-container');
+    container.innerHTML = '';
+
+    if (data.length === 0) {
+      container.innerHTML = "<p>No orders yet!</p>";
+      return;
     }
 
-    function renderOrders(data) {
-      const container = document.getElementById('orders-container');
-      container.innerHTML = '';
+    // Show latest first
+    data.reverse().forEach((order, index) => {
+      const card = document.createElement('div');
+      card.className = 'order-card';
 
-      if (data.length === 0) {
-        container.innerHTML = "<p>No orders yet!</p>";
-        return;
-      }
+      const id = index + 1; // use index as fallback order ID
+      const status = orderStatuses[id] || "preparing";
+      const timestamp = order.timestamp
+        ? new Date(order.timestamp).toLocaleString()
+        : "🕒 Unknown time";
 
-      // Show latest first
-      data.reverse().forEach((order) => {
-        const card = document.createElement('div');
-        card.className = 'order-card';
+      card.innerHTML = `
+        <h3>Order #${id}</h3>
+        <p><strong>Salad:</strong> ${order.name || 'N/A'} × ${order.quantity || 1}</p>
+        <p><strong>Toppings:</strong> ${order.toppings?.length ? order.toppings.join(', ') : 'None'}</p>
+        <p><strong>Dressings:</strong> ${order.dressings?.length ? order.dressings.join(', ') : 'None'}</p>
+        <p><strong>Extras:</strong> ${order.extras?.length ? order.extras.join(', ') : 'None'}</p>
+        <p><strong>Total:</strong> ₹${order.total || 0}</p>
+        <p class="timestamp">${timestamp}</p>
+        <p class="status status-${status}">${getStatusText(status)}</p>
+        <div class="status-button">
+          <button onclick="updateStatus(${id}, 'preparing')">🥗 Preparing</button>
+          <button onclick="updateStatus(${id}, 'almost')">🍳 Almost Ready</button>
+          <button onclick="updateStatus(${id}, 'ready')">✅ Ready</button>
+        </div>
+      `;
 
-        const id = order.id;
-        const status = orderStatuses[id] || "preparing";
-        const timestamp = order.timestamp
-          ? new Date(order.timestamp).toLocaleString()
-          : "🕒 Unknown time";
+      container.appendChild(card);
+    });
+  }
 
-        card.innerHTML = `
-          <h3>Order #${id}</h3>
-          <p><strong>Salad:</strong> ${order.name || 'N/A'} × ${order.quantity || 1}</p>
-          <p><strong>Toppings:</strong> ${order.toppings?.length ? order.toppings.join(', ') : 'None'}</p>
-          <p><strong>Dressings:</strong> ${order.dressings?.length ? order.dressings.join(', ') : 'None'}</p>
-          <p><strong>Extras:</strong> ${order.extras?.length ? order.extras.join(', ') : 'None'}</p>
-          <p><strong>Total:</strong> ₹${order.total || 0}</p>
-          <p class="timestamp">${timestamp}</p>
-          <p class="status status-${status}">${getStatusText(status)}</p>
-          <div class="status-button">
-            <button onclick="updateStatus(${id}, 'preparing')">🥗 Preparing</button>
-            <button onclick="updateStatus(${id}, 'almost')">🍳 Almost Ready</button>
-            <button onclick="updateStatus(${id}, 'ready')">✅ Ready</button>
-          </div>
-        `;
-
-        container.appendChild(card);
-      });
-    }
-
-    function updateStatus(id, newStatus) {
-      orderStatuses[id] = newStatus;
-      fetchOrders();
-    }
-
-    function fetchOrders() {
-fetch('https://salad-kiosk.onrender.com/api/orders')
-        .then(res => res.json())
-        .then(data => renderOrders(data))
-        .catch(err => {
-          document.getElementById('orders-container').innerHTML = '<p style="color:red;">Failed to load orders.</p>';
-          console.error(err);
-        });
-    }
-
+  function updateStatus(id, newStatus) {
+    orderStatuses[id] = newStatus;
     fetchOrders();
-    setInterval(fetchOrders, 15000); // Auto-refresh every 15 seconds
-  </script>
+  }
+
+  function fetchOrders() {
+    fetch('https://salad-kiosk.onrender.com/api/orders')
+      .then(res => res.json())
+      .then(data => renderOrders(data))
+      .catch(err => {
+        document.getElementById('orders-container').innerHTML = '<p style="color:red;">⚠️ Failed to load orders.</p>';
+        console.error(err);
+      });
+  }
+
+  // Load orders initially + refresh every 15 seconds
+  fetchOrders();
+  setInterval(fetchOrders, 15000);
+</script>
+
 </body>
 </html>

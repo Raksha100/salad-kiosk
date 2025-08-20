@@ -13,6 +13,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// ✅ Serve static frontend files (for kitchen.html, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
+
 // ✅ Ensure orders.json exists
 if (!fs.existsSync(ORDERS_FILE)) {
   fs.writeFileSync(ORDERS_FILE, JSON.stringify([]));
@@ -51,6 +54,11 @@ app.post('/api/orders', (req, res) => {
     console.error('Error saving order:', err);
     res.status(500).json({ error: 'Failed to save order.' });
   }
+});
+
+// ✅ Kitchen page route
+app.get('/kitchen', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'kitchen.html'));
 });
 
 // ✅ Start server (Render/Netlify-friendly)
