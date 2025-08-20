@@ -46,7 +46,7 @@
     <h2>🥗 Your Order Summary</h2>
     <div id="receipt"></div>
     <p>🎉 Order placed successfully!</p>
-    <p>⏳ Please complete payment in 95 seconds</p>
+    <p id="countdown">⏳ Please complete payment in 95 seconds</p>
 
     <p><strong>Scan to Pay ₹<span id="total-amount">0</span></strong></p>
 
@@ -73,9 +73,13 @@
 
     const lines = [];
 
+    // ✅ Show Salad Name properly
     if (order.salad) {
       lines.push(`<strong>Salad:</strong> ${order.salad} (₹${order.price || 0})`);
+    } else if (order.name) {
+      lines.push(`<strong>Salad:</strong> ${order.name} (₹${order.price || 0})`);
     }
+
     if (order.quantity) {
       lines.push(`<strong>Quantity:</strong> ${order.quantity}`);
     }
@@ -95,7 +99,20 @@
 
     receiptDiv.innerHTML = lines.join("<br>");
 
-    // Generate UPI QR
+    // ✅ Payment countdown
+    let timeLeft = 95;
+    const countdownEl = document.getElementById("countdown");
+    const timer = setInterval(() => {
+      if (timeLeft > 0) {
+        countdownEl.textContent = `⏳ Please complete payment in ${timeLeft} seconds`;
+        timeLeft--;
+      } else {
+        countdownEl.textContent = "❌ Payment time expired!";
+        clearInterval(timer);
+      }
+    }, 1000);
+
+    // ✅ Generate UPI QR
     const upiId = "sakshyysharma20@okicici";
     const payeeName = "Salad Kiosk";
     const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${total}&cu=INR`;
@@ -108,13 +125,13 @@
       }
     });
 
- // Send to kitchen
+    // ✅ Send to kitchen with proper ID
     sendBtn.addEventListener("click", () => {
       sendBtn.disabled = true;
       const timestamp = new Date().toLocaleString("en-IN");
       const kitchenOrder = { ...order, timestamp };
 
-      fetch("https://salad-kiosk.onrender.com/api/orders", {   // ✅ updated
+      fetch("https://salad-kiosk.onrender.com/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(kitchenOrder)
