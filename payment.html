@@ -108,13 +108,13 @@
       }
     });
 
-    // Send to kitchen
+ // Send to kitchen
     sendBtn.addEventListener("click", () => {
       sendBtn.disabled = true;
       const timestamp = new Date().toLocaleString("en-IN");
       const kitchenOrder = { ...order, timestamp };
 
-      fetch("http://localhost:3000/api/orders", {
+      fetch("https://salad-kiosk.onrender.com/api/orders", {   // ✅ updated
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(kitchenOrder)

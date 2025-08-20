@@ -129,9 +129,8 @@
     const order = getOrderDetails();
     localStorage.setItem("saladOrder", JSON.stringify(order));
 
-    // OPTIONAL: send to backend
     try {
-      await fetch("http://localhost:3000/api/orders", {
+      await fetch("https://salad-kiosk.onrender.com/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

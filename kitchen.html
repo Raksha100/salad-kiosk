@@ -24,7 +24,6 @@
       padding: 15px 20px;
       border-radius: 20px;
       box-shadow: 2px 2px 5px #d9b99b;
-      position: relative;
     }
 
     .order-card h3 {
@@ -79,7 +78,7 @@
   <div id="orders-container">Loading orders...</div>
 
   <script>
-    let orderStatuses = {}; // memory object
+    let orderStatuses = {}; // Tracks status by order.id
 
     function getStatusText(status) {
       switch (status) {
@@ -99,20 +98,24 @@
         return;
       }
 
-      data.reverse().forEach((order, index) => {
+      // Show latest first
+      data.reverse().forEach((order) => {
         const card = document.createElement('div');
         card.className = 'order-card';
 
-        const id = data.length - index;
+        const id = order.id;
         const status = orderStatuses[id] || "preparing";
-        const timestamp = new Date(order.timestamp).toLocaleString();
+        const timestamp = order.timestamp
+          ? new Date(order.timestamp).toLocaleString()
+          : "🕒 Unknown time";
 
         card.innerHTML = `
           <h3>Order #${id}</h3>
-          <p><strong>Salad:</strong> ${order.name} × ${order.quantity}</p>
-          <p><strong>Toppings:</strong> ${order.toppings.join(', ') || 'None'}</p>
-          <p><strong>Dressings:</strong> ${order.dressings.join(', ') || 'None'}</p>
-          <p><strong>Total:</strong> ₹${order.total}</p>
+          <p><strong>Salad:</strong> ${order.name || 'N/A'} × ${order.quantity || 1}</p>
+          <p><strong>Toppings:</strong> ${order.toppings?.length ? order.toppings.join(', ') : 'None'}</p>
+          <p><strong>Dressings:</strong> ${order.dressings?.length ? order.dressings.join(', ') : 'None'}</p>
+          <p><strong>Extras:</strong> ${order.extras?.length ? order.extras.join(', ') : 'None'}</p>
+          <p><strong>Total:</strong> ₹${order.total || 0}</p>
           <p class="timestamp">${timestamp}</p>
           <p class="status status-${status}">${getStatusText(status)}</p>
           <div class="status-button">
@@ -132,17 +135,17 @@
     }
 
     function fetchOrders() {
-      fetch('http://localhost:3000/api/orders')
+fetch('https://salad-kiosk.onrender.com/api/orders')
         .then(res => res.json())
         .then(data => renderOrders(data))
         .catch(err => {
-          document.getElementById('orders-container').innerHTML = '<p>Failed to load orders.</p>';
+          document.getElementById('orders-container').innerHTML = '<p style="color:red;">Failed to load orders.</p>';
           console.error(err);
         });
     }
 
     fetchOrders();
-    setInterval(fetchOrders, 15000); // Auto-refresh every 15s
+    setInterval(fetchOrders, 15000); // Auto-refresh every 15 seconds
   </script>
 </body>
 </html>

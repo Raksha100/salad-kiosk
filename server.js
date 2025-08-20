@@ -9,7 +9,7 @@ const ORDERS_FILE = path.join(__dirname, 'orders.json');
 
 // ✅ Middleware
 app.use(cors({
-  origin: '*' // allow requests from Netlify frontend
+  origin: '*' // allow requests from any frontend (Netlify/Local)
 }));
 app.use(express.json());
 
@@ -53,8 +53,8 @@ app.post('/api/orders', (req, res) => {
   }
 });
 
-// ✅ Start server
-app.listen(PORT, '0.0.0.0', () => {
+// ✅ Start server (Render/Netlify-friendly)
+app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌐 Railway should expose it at https://<your-railway-app>.up.railway.app/`);
+  console.log(`🌐 Available at https://salad-kiosk.onrender.com/`);
 });

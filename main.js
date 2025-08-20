@@ -1,18 +1,17 @@
 const { app, BrowserWindow } = require('electron');
-const path = require('path');
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 1024,
     height: 768,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,  // safer since you don’t need Node inside frontend
+      contextIsolation: true,
     },
     title: "Saladific Café"
   });
 
-  // Load your deployed Netlify frontend
+  // Load deployed Netlify frontend
   win.loadURL('https://salad-kiosk.netlify.app/');
 }
 
